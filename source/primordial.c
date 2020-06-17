@@ -185,6 +185,7 @@ int primordial_spectrum_at_k(
 
 int primordial_init(
                     struct precision  * ppr,
+                    struct background * pba,
                     struct perturbs   * ppt,
                     struct primordial * ppm
                     ) {
@@ -388,7 +389,7 @@ int primordial_init(
     if (ppm->primordial_verbose > 0)
       printf(" (Pk calculated externally)\n");
 
-    class_call_except(primordial_external_spectrum_init(ppt,ppm),
+    class_call_except(primordial_external_spectrum_init(pba,ppt,ppm),
                       ppm->error_message,
                       ppm->error_message,
                       primordial_free(ppm));
@@ -3264,6 +3265,7 @@ int primordial_inflation_derivs(
  */
 
 int primordial_external_spectrum_init(
+                                      struct background * pba,
                                       struct perturbs * ppt,
                                       struct primordial * ppm
                                       ) {
@@ -3293,9 +3295,10 @@ int primordial_external_spectrum_init(
   }
   /* otherwise pass the list of arguments */
   else {
-    sprintf(arguments, " %g %g %g %g %g %g %g %g %g %g",
+    sprintf(arguments, " %g %g %g %g %g %g %g %g %g %g %g",
             ppm->custom1, ppm->custom2, ppm->custom3, ppm->custom4, ppm->custom5,
-            ppm->custom6, ppm->custom7, ppm->custom8, ppm->custom9, ppm->custom10);
+            ppm->custom6, ppm->custom7, ppm->custom8, ppm->custom9, ppm->custom10,
+            pba->h*100);
   }
   /* write the actual command in a string */
   sprintf(command_with_arguments, "%s %s", ppm->command, arguments);
@@ -3338,6 +3341,13 @@ int primordial_external_spectrum_init(
         pkt = tmp;
       };
     };
+
+    /* Test for nans */
+    class_test(isnan(this_pks),
+               ppm->error_message,
+               "Failed computing the external primordial power spectrum, "
+               "returned nans instead. ");
+
     /* Store */
     k  [n_data]   = this_k;
     pks[n_data]   = this_pks;
