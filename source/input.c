@@ -3771,7 +3771,7 @@ int input_try_unknown_parameters(double * unknown_parameter,
     if (input_verbose>2)
       printf("Stage 4: primordial\n");
     pm.primordial_verbose = 0;
-    class_call_except(primordial_init(&pr,&pt,&pm),
+    class_call_except(primordial_init(&pr,&ba,&pt,&pm),
                       pm.error_message,
                       errmsg,
                       perturb_free(&pt);thermodynamics_free(&th);background_free(&ba)
